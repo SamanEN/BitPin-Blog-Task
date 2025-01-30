@@ -9,7 +9,7 @@
 
     <h2>Create a New Blog Post</h2>
 
-    <form action="/blogs/create/" method="POST">
+    <form action="{% url 'create_blog_post' %}" method="POST">
         {% csrf_token %}
         <label for="title">Title:</label><br>
         <input type="text" id="title" name="title" required><br><br>

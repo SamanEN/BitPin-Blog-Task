@@ -17,6 +17,15 @@
 
     <hr>
 
+    <h4>Rate this Blog Post:</h4>
+    <form method="POST" action="{% url 'rate_blog' %}">
+        {% csrf_token %}
+        <input type="hidden" name="blog" value="{{ blog.id }}">  <!-- Blog Post ID -->
+        <label for="rating">Rating (1-5):</label>
+        <input type="number" name="rating" id="rating" min="1" max="5" required>
+        <button type="submit">Submit Rating</button>
+    </form>
+
     <p><a href="{% url 'blog_posts_list' %}">Back to Blog List</a></p>
 
 </body>
