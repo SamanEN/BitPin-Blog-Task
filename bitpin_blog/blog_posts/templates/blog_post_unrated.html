@@ -1,0 +1,12 @@
+{% extends "blog_post_base.html" %}
+
+{% block edit_section %}
+<h4>Rate this Blog Post:</h4>
+<form method="POST" action="{% url 'rate_blog' %}">
+    {% csrf_token %}
+    <input type="hidden" name="blog" value="{{ blog.id }}">
+    <label for="rating">Rating (1-5):</label>
+    <input type="number" name="rating" id="rating" min="1" max="5" required>
+    <button type="submit">Submit Rating</button>
+</form>
+{% endblock %}

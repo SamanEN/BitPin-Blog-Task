@@ -6,6 +6,7 @@ from rest_framework.response import Response
 
 from .models import BlogPost
 from .serializers import BlogPostSerializer
+from rate.models import Rate
 
 class BlogPostCreateView(APIView):
     """This view creates blog posts based on authenticated user requests."""
@@ -45,4 +46,16 @@ class BlogPostDisplayView(APIView):
         """Will fetch a blog post and display it to the user."""
 
         blog = get_object_or_404(BlogPost, id=blog_id)
-        return render(request, 'blog_post.html', {'blog': blog})
+        user = request.user
+
+        if user_has_rated_(blog, user):
+            return render(request, 'blog_post_rated.html', {'blog': blog})
+
+        return render(request, 'blog_post_unrated.html', {'blog': blog})
+    
+
+def user_has_rated_(blog, user):
+    """Util function to check if the user has rated a blog or not. It will be
+    used to decide which template should be sent out."""
+
+    return Rate.objects.filter(blog=blog, user=user).exists()

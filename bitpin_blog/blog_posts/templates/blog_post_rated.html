@@ -1,0 +1,34 @@
+{% extends "blog_post_base.html" %}
+
+{% block edit_section %}
+<p>You've rated this blog <span id="user-rating">Loading...</span> stars!</p>
+<h4>Edit your rating:</h4>
+<form method="PUT" action="/">
+    {% csrf_token %}
+    <input type="hidden" name="blog" value="{{ blog.id }}">
+    <label for="rating">Rating (1-5):</label>
+    <input type="number" name="rating" id="rating" min="1" max="5" required>
+    <button type="submit">Edit Rating</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+        const blogId = "{{ blog.id }}";
+        const ratingUrl = `/rate/get_user_rating/${blogId}/`;
+
+        function loadUserRatingInfo() {
+            fetch(ratingUrl)
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById("user-rating").innerText = data.user_rating.toFixed(1);
+                })
+                .catch(error => {
+                    console.error("Error loading rating info:", error);
+                    document.getElementById("user-rating").innerText = "N/A";
+                });
+        }
+
+        loadUserRatingInfo();
+    });
+</script>
+{% endblock %}
