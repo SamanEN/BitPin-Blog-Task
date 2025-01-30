@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Posts</title>
+</head>
+<body>
+
+    <h2>Blog Posts</h2>
+
+    {% if blog_posts %}
+        <ul>
+            {% for post in blog_posts %}
+                <li>
+                    <h3>{{ post.title }}</h3>
+                    <p>{{ post.content }}</p>
+                    <small>By: {{ post.author.username }} | {{ post.created_at }}</small>
+                </li>
+                <hr>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No blog posts available.</p>
+    {% endif %}
+
+    <a href="{% url 'create_blog_post' %}">Create a New Post</a>
+
+</body>
+</html>
