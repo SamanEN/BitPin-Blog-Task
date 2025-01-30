@@ -10,6 +10,32 @@
     <h1>{{ blog.title }}</h1>
     <p><strong>Author:</strong> {{ blog.author.username }}</p>
     <p><strong>Published on:</strong> {{ blog.created_at }}</p>
+    <p><strong>Average Rating: <span id="average-rating">Loading...</span></strong></p>
+    <p>Total Ratings: <span id="total-ratings">Loading...</span></p>
+
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            const blogId = "{{ blog.id }}";
+            const ratingUrl = `/rate/get/${blogId}/`;
+
+            function loadRatingInfo() {
+                fetch(ratingUrl)
+                    .then(response => response.json())
+                    .then(data => {
+                        document.getElementById("average-rating").innerText = data.average_rating.toFixed(1);
+                        document.getElementById("total-ratings").innerText = data.total_ratings;
+                    })
+                    .catch(error => {
+                        console.error("Error loading rating info:", error);
+                        document.getElementById("average-rating").innerText = "N/A";
+                        document.getElementById("total-ratings").innerText = "N/A";
+                    });
+            }
+
+            loadRatingInfo();
+        });
+    </script>
 
     <hr>
     
@@ -20,7 +46,7 @@
     <h4>Rate this Blog Post:</h4>
     <form method="POST" action="{% url 'rate_blog' %}">
         {% csrf_token %}
-        <input type="hidden" name="blog" value="{{ blog.id }}">  <!-- Blog Post ID -->
+        <input type="hidden" name="blog" value="{{ blog.id }}">
         <label for="rating">Rating (1-5):</label>
         <input type="number" name="rating" id="rating" min="1" max="5" required>
         <button type="submit">Submit Rating</button>
