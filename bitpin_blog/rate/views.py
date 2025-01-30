@@ -21,7 +21,7 @@ class RateCreateView(APIView):
         if serializer.is_valid():
             serializer.save(user=request.user)
             blog_id = request.data.get('blog')
-            return redirect(f'/blog/{blog_id}')
+            return redirect('blog_post_display', blog_id=blog_id)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
