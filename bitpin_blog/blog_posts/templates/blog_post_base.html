@@ -17,9 +17,9 @@
     <script>
         document.addEventListener("DOMContentLoaded", function () {
             const blogId = "{{ blog.id }}";
-            const ratingUrl = `/rate/get/${blogId}/`;
+            const ratingUrl = `/rate/get_blog_rating/${blogId}/`;
 
-            function loadRatingInfo() {
+            function loadBlogRatingInfo() {
                 fetch(ratingUrl)
                     .then(response => response.json())
                     .then(data => {
@@ -33,7 +33,7 @@
                     });
             }
 
-            loadRatingInfo();
+            loadBlogRatingInfo();
         });
     </script>
 

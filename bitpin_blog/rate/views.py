@@ -10,21 +10,24 @@ from blog_posts.models import BlogPost
 from .serializers import RateSerializer
 from .models import Rate
 
+
 class RateCreateView(APIView):
     """This view will only handle creating ratings for blogs."""
 
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request):
-        serializer = RateSerializer(data=request.data, context={'request': request})
-        
+        serializer = RateSerializer(
+            data=request.data, context={'request': request})
+
         if serializer.is_valid():
             serializer.save(user=request.user)
             blog_id = request.data.get('blog')
             return redirect('blog_post_display', blog_id=blog_id)
-        
+
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
+
+
 class BlogRatingStatsView(APIView):
     """This view will fetch displayed info of a blog post's ratings."""
 
@@ -35,7 +38,7 @@ class BlogRatingStatsView(APIView):
         Returns the average rating and the total number of ratings for a given blog post.
         """
         blog = get_object_or_404(BlogPost, id=blog_id)
-        
+
         rating_data = Rate.objects.filter(blog=blog).aggregate(
             average_rating=Avg('rating'),
             total_ratings=Count('id')
@@ -45,3 +48,18 @@ class BlogRatingStatsView(APIView):
             "average_rating": rating_data["average_rating"] or 0,
             "total_ratings": rating_data["total_ratings"]
         }, status=status.HTTP_200_OK)
+
+
+class UserRatingStatsView(APIView):
+    """This view will fetch the current user rating for the specified blog."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request, blog_id):
+        rate = get_object_or_404(Rate, id=blog_id, user=request.user)
+
+        return Response({
+            "user_rating": rate.rating
+        },
+            status=status.HTTP_200_OK
+        )
