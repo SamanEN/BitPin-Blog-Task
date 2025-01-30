@@ -3,7 +3,7 @@
 {% block edit_section %}
 <p>You've rated this blog <span id="user-rating">Loading...</span> stars!</p>
 <h4>Edit your rating:</h4>
-<form method="PUT" action="/">
+<form method="POST" action="{% url 'edit_user_rating' blog_id=blog.id %}">
     {% csrf_token %}
     <input type="hidden" name="blog" value="{{ blog.id }}">
     <label for="rating">Rating (1-5):</label>

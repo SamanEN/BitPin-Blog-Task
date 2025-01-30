@@ -4,11 +4,13 @@ from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
+from rest_framework import exceptions
 
 from blog_posts.models import BlogPost
 
 from .serializers import RateSerializer
 from .models import Rate
+from .exceptions import BlogIsAlreadyRated
 
 
 class RateCreateView(APIView):
@@ -20,12 +22,16 @@ class RateCreateView(APIView):
         serializer = RateSerializer(
             data=request.data, context={'request': request})
 
-        if serializer.is_valid():
-            serializer.save(user=request.user)
-            blog_id = request.data.get('blog')
-            return redirect('blog_post_display', blog_id=blog_id)
+        if not serializer.is_valid():
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        blog_id = serializer.validated_data.get('blog')
+        if Rate.objects.filter(user=request.user, blog_id=blog_id).exists():
+            raise BlogIsAlreadyRated()
+        
+        serializer.save(user=request.user)
+        blog_id = request.data.get('blog')
+        return redirect('blog_post_display', blog_id=blog_id)
 
 
 class BlogRatingStatsView(APIView):
@@ -56,10 +62,28 @@ class UserRatingStatsView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get(self, request, blog_id):
-        rate = get_object_or_404(Rate, id=blog_id, user=request.user)
+        rate = get_object_or_404(Rate, blog_id=blog_id, user=request.user)
 
         return Response({
             "user_rating": rate.rating
         },
             status=status.HTTP_200_OK
         )
+
+class UpdateUserRatingView(APIView):
+    """This view will update the rating of a blog for the current user."""
+
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, blog_id):
+        rate = get_object_or_404(Rate, user=request.user, blog_id=blog_id)
+        
+        serializer = RateSerializer(
+            rate, data=request.data, context={'request': request}, partial=True
+        )
+        
+        if serializer.is_valid():
+            serializer.save()
+            return redirect('blog_post_display', blog_id=blog_id)
+        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
