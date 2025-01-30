@@ -1,4 +1,4 @@
-from django.shortcuts import redirect, render
+from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.views import APIView
@@ -35,3 +35,14 @@ class BlogPostsListView(APIView):
     def get(self, request):
         blog_posts = BlogPost.objects.all()
         return render(request, 'blogs_list.html', {'blog_posts': blog_posts})
+    
+class BlogPostDisplayView(APIView):
+    """This view will return and display a specified blog post."""
+
+    permission_classes = [permissions.IsAuthenticatedOrReadOnly]
+
+    def get(self, request, blog_id):
+        """Will fetch a blog post and display it to the user."""
+
+        blog = get_object_or_404(BlogPost, id=blog_id)
+        return render(request, 'blog_post.html', {'blog': blog})
