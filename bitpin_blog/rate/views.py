@@ -4,13 +4,13 @@ from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework import exceptions
 
 from blog_posts.models import BlogPost
 
 from .serializers import RateSerializer
+from .utils import can_request_rating
 from .models import Rate
-from .exceptions import BlogIsAlreadyRated
+from .exceptions import BlogIsAlreadyRated, TooManyRatingRequests
 
 
 class RateCreateView(APIView):
@@ -25,9 +25,12 @@ class RateCreateView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-        blog_id = serializer.validated_data.get('blog')
-        if Rate.objects.filter(user=request.user, blog_id=blog_id).exists():
+        blog = serializer.validated_data.get('blog')
+        if Rate.objects.filter(user=request.user, blog=blog).exists():
             raise BlogIsAlreadyRated()
+
+        if not can_request_rating(blog):
+            raise TooManyRatingRequests()
         
         serializer.save(user=request.user)
         blog_id = request.data.get('blog')

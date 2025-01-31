@@ -1,10 +1,12 @@
+import time
+
 from django.shortcuts import get_object_or_404, redirect, render
 from rest_framework import permissions
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import BlogPost
+from .models import BlogPost, BlogRatingLeakyBucket
 from .serializers import BlogPostSerializer
 from rate.models import Rate
 
@@ -20,7 +22,10 @@ class BlogPostCreateView(APIView):
         if not serializer.is_valid():
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-        serializer.save(author=request.user)
+        new_blog_post = serializer.save(author=request.user)
+
+        BlogRatingLeakyBucket.objects.create(blog_post=new_blog_post, last_record=time.time())
+        
         return redirect('/')
 
     def get(self, request):
