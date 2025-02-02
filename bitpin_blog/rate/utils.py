@@ -16,11 +16,11 @@ def can_request_rating(blog_post: BlogPost) -> bool:
 
     bucket: BlogRatingLeakyBucket = blog_post.leaky_bucket
     
-    elapsed_time = time.time() - bucket.last_record
+    elapsed_time = int(time.time()) - bucket.last_record
     bucket.last_record = time.time()
 
     bucket.bucket_size -= elapsed_time * bucket.leak_rate
-    bucket.bucket_size = min(bucket.bucket_size, 0)
+    bucket.bucket_size = max(bucket.bucket_size, 0)
 
     bucket.bucket_size += 1
 

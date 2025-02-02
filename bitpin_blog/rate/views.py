@@ -33,8 +33,7 @@ class RateCreateView(APIView):
             raise TooManyRatingRequests()
         
         serializer.save(user=request.user)
-        blog_id = request.data.get('blog')
-        return redirect('blog_post_display', blog_id=blog_id)
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
 
 class BlogRatingStatsView(APIView):

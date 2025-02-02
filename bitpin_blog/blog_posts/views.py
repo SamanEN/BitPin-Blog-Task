@@ -26,7 +26,7 @@ class BlogPostCreateView(APIView):
 
         BlogRatingLeakyBucket.objects.create(blog_post=new_blog_post, last_record=time.time())
         
-        return redirect('/')
+        return Response(serializer.data, status.HTTP_201_CREATED)
 
     def get(self, request):
         """Will respond with the blog post form page."""

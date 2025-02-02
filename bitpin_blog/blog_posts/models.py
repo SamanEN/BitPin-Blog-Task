@@ -16,8 +16,11 @@ class BlogRatingLeakyBucket(models.Model):
     received.
     """
 
+    BUCKET_CAPACITY = 20
+    LEAK_RATE = 10
+
     blog_post = models.OneToOneField(BlogPost, on_delete=models.CASCADE, related_name='leaky_bucket')
     bucket_size = models.IntegerField(default=0)
-    bucket_capacity = models.IntegerField(default=500)
-    leak_rate = models.IntegerField(default=100)
-    last_record = models.FloatField()
+    bucket_capacity = models.IntegerField(default=BUCKET_CAPACITY)
+    leak_rate = models.IntegerField(default=LEAK_RATE)
+    last_record = models.IntegerField()
