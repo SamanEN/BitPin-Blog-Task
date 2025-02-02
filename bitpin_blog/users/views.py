@@ -1,11 +1,11 @@
 from django.contrib.auth.models import User
-from django.contrib.auth import login, authenticate
-
+from django.contrib.auth import login, authenticate, logout
 from django.shortcuts import redirect, render
+
 from rest_framework import status
+from rest_framework import permissions
 from rest_framework.exceptions import AuthenticationFailed
 from rest_framework.response import Response
-from rest_framework.permissions import AllowAny
 from rest_framework.views import APIView
 
 from .serializers import RegisterSerializer, LoginSerializer
@@ -13,7 +13,7 @@ from .exceptions import UserIsRepetitive
 
 
 class RegisterView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         """Will respond with the register page."""
@@ -38,7 +38,7 @@ class RegisterView(APIView):
 
 
 class LoginView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [permissions.AllowAny]
 
     def get(self, request):
         """Will respond with the login page."""
@@ -60,3 +60,10 @@ class LoginView(APIView):
             raise AuthenticationFailed()
 
         return redirect('/')
+    
+class LogoutView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request):
+        logout(request)
+        return Response({'message': 'Logout was successful.'}, status=status.HTTP_200_OK)
