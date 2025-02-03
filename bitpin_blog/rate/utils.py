@@ -39,7 +39,7 @@ def can_request_rating_ema(blog_post: BlogPost) -> bool:
     constant to check if the current request rate is acceptable or not.
     """
 
-    ratings_count = Rate.objects.filter(blog_post=blog_post).count()
+    ratings_count = Rate.objects.filter(blog=blog_post).count()
     ema = BlogRatingEma.objects.get(blog_post=blog_post)
 
     current_rate = time.time() - ema.last_record
