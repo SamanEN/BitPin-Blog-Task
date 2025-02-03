@@ -31,7 +31,7 @@ class BlogRatingEma(models.Model):
     moving average for rate limiting.
     """
 
-    THRESHOLD = 10
+    THRESHOLD = 2
 
     blog_post = models.OneToOneField(BlogPost, on_delete=models.CASCADE, related_name='ema')
     mean_request_rate = models.FloatField(default=0)

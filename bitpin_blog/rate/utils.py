@@ -46,14 +46,14 @@ def can_request_rating_ema(blog_post: BlogPost) -> bool:
     ema.last_record = time.time()
 
     current_mean = ema.mean_request_rate
-    updated_mean = (current_mean + current_rate) / (ratings_count + 1)
+    updated_mean = (current_mean * ratings_count + current_rate) / (ratings_count + 1)
 
     current_variation_sum = ema.variation_sum
     updated_variation_sum = current_variation_sum + (current_rate - updated_mean) ** 2
     std = math.sqrt(updated_variation_sum / (ratings_count + 1))
     std = 1 if std == 0 else std
 
-    z = (current_rate - updated_mean) / std
+    z = (updated_mean - current_rate) / std
 
     ema.mean_request_rate = updated_mean
     ema.variation_sum = updated_variation_sum
@@ -61,4 +61,4 @@ def can_request_rating_ema(blog_post: BlogPost) -> bool:
 
     if ratings_count == 0:
         return True
-    return z > BlogRatingEma.THRESHOLD
+    return z <= BlogRatingEma.THRESHOLD
