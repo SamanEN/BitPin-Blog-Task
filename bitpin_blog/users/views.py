@@ -17,7 +17,7 @@ class RegisterView(APIView):
 
     def get(self, request):
         """Will respond with the register page."""
-        
+
         return render(request, 'register.html')
 
     def post(self, request):
@@ -34,7 +34,10 @@ class RegisterView(APIView):
 
         login(request, user)
 
-        return redirect('/')
+        return Response(
+            {'message': 'User registered and logged in successfully.'},
+            status=status.HTTP_201_CREATED
+        )
 
 
 class LoginView(APIView):
@@ -59,8 +62,9 @@ class LoginView(APIView):
         if not user:
             raise AuthenticationFailed()
 
-        return redirect('/')
-    
+        return Response({'message': 'Login successful.'}, status=status.HTTP_200_OK)
+
+
 class LogoutView(APIView):
     permission_classes = [permissions.IsAuthenticated]
 

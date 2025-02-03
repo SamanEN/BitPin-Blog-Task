@@ -52,14 +52,11 @@ class BlogRatingStatsView(APIView):
         """
         blog = get_object_or_404(BlogPost, id=blog_id)
 
-        rating_data = Rate.objects.filter(blog=blog).aggregate(
-            average_rating=Avg('rating'),
-            total_ratings=Count('id')
-        )
+        ratings_count = Rate.objects.filter(blog=blog).count()
 
         return Response({
-            "average_rating": rating_data["average_rating"] or 0,
-            "total_ratings": rating_data["total_ratings"]
+            "average_rating": blog.average_rating,
+            "total_ratings": ratings_count
         }, status=status.HTTP_200_OK)
 
 
@@ -91,6 +88,6 @@ class UpdateUserRatingView(APIView):
         
         if serializer.is_valid():
             serializer.save()
-            return redirect('blog_post_display', blog_id=blog_id)
+            return Response(serializer.data, status=status.HTTP_200_OK)
         
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
