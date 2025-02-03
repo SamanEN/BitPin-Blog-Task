@@ -6,7 +6,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
 
-from .models import BlogPost, BlogRatingLeakyBucket
+from .models import BlogPost, BlogRatingLeakyBucket, BlogRatingEma
 from .serializers import BlogPostSerializer
 from rate.models import Rate
 
@@ -25,6 +25,7 @@ class BlogPostCreateView(APIView):
         new_blog_post = serializer.save(author=request.user)
 
         BlogRatingLeakyBucket.objects.create(blog_post=new_blog_post, last_record=time.time())
+        BlogRatingEma.objects.create(blog_post=new_blog_post, last_record=time.time())
         
         return Response(serializer.data, status.HTTP_201_CREATED)
 

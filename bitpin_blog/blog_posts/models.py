@@ -24,3 +24,17 @@ class BlogRatingLeakyBucket(models.Model):
     bucket_capacity = models.IntegerField(default=BUCKET_CAPACITY)
     leak_rate = models.IntegerField(default=LEAK_RATE)
     last_record = models.IntegerField()
+
+class BlogRatingEma(models.Model):
+    """
+    This model saves the required information to implement the Exponential
+    moving average for rate limiting.
+    """
+
+    THRESHOLD = 10
+
+    blog_post = models.OneToOneField(BlogPost, on_delete=models.CASCADE, related_name='ema')
+    mean_request_rate = models.FloatField(default=0)
+    # To calculate the standard deviation sequentially
+    variation_sum = models.FloatField(default=0)
+    last_record = models.FloatField()

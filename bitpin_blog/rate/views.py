@@ -8,7 +8,7 @@ from rest_framework import status
 from blog_posts.models import BlogPost
 
 from .serializers import RateSerializer
-from .utils import can_request_rating
+from .utils import can_request_rating_leaky_bucket
 from .models import Rate
 from .exceptions import BlogIsAlreadyRated, TooManyRatingRequests
 
@@ -29,7 +29,7 @@ class RateCreateView(APIView):
         if Rate.objects.filter(user=request.user, blog=blog).exists():
             raise BlogIsAlreadyRated()
 
-        if not can_request_rating(blog):
+        if not can_request_rating_leaky_bucket(blog):
             raise TooManyRatingRequests()
         
         serializer.save(user=request.user)
