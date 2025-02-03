@@ -1,6 +1,9 @@
 # VSCode
 .vscode
 
+# Reports docx files
+*.docx
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
