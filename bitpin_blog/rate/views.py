@@ -1,5 +1,6 @@
 from django.shortcuts import get_object_or_404, redirect
 from django.db.models import Avg, Count
+from flags.state import flag_enabled
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -8,7 +9,7 @@ from rest_framework import status
 from blog_posts.models import BlogPost
 
 from .serializers import RateSerializer
-from .utils import can_request_rating_leaky_bucket
+from .utils import can_request_rating_ema, can_request_rating_leaky_bucket
 from .models import Rate
 from .exceptions import BlogIsAlreadyRated, TooManyRatingRequests
 
@@ -29,8 +30,12 @@ class RateCreateView(APIView):
         if Rate.objects.filter(user=request.user, blog=blog).exists():
             raise BlogIsAlreadyRated()
 
-        if not can_request_rating_leaky_bucket(blog):
-            raise TooManyRatingRequests()
+        if flag_enabled('LEAKY_BUCKET'):
+            if not can_request_rating_leaky_bucket(blog):
+                raise TooManyRatingRequests()
+        if flag_enabled('EMA'):
+            if not can_request_rating_ema(blog):
+                raise TooManyRatingRequests()
         
         serializer.save(user=request.user)
         return Response(serializer.data, status.HTTP_201_CREATED)

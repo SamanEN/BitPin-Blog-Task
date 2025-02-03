@@ -10,7 +10,9 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from enum import Flag
 from pathlib import Path
+from sre_parse import FLAGS
 import sys
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -39,6 +41,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'flags',
     'users.apps.UsersConfig',
     'blog_posts.apps.BlogPostsConfig',
     'rate.apps.RateConfig'
@@ -139,4 +142,19 @@ REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework.authentication.SessionAuthentication',
     ),
+}
+
+FLAGS = {
+    'LEAKY_BUCKET': [
+        {
+            'condition': 'boolean',
+            'value': False
+        }
+    ],
+    'EMA': [
+        {
+            'condition': 'boolean',
+            'value': True
+        }
+    ]
 }
